@@ -431,7 +431,7 @@ public class NvdCveUpdater implements CachedWebDataSource {
      */
     private Map<String, Long> retrieveLastModifiedDates(int startYear, int endYear)
             throws MalformedURLException, DownloadFailedException {
-
+        final long now = System.currentTimeMillis();
         final Set<String> urls = new HashSet<>();
         final String baseUrl20 = settings.getString(Settings.KEYS.CVE_SCHEMA_2_0);
         for (int i = startYear; i <= endYear; i++) {
@@ -453,6 +453,9 @@ public class NvdCveUpdater implements CachedWebDataSource {
             final long timestamp;
             try {
                 timestamp = timestampFuture.get(60, TimeUnit.SECONDS);
+                if (timestamp == 0) {
+                    timestamp = now;
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new DownloadFailedException(e);
